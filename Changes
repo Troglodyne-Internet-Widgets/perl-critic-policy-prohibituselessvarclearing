@@ -1,0 +1,6 @@
+Revision history for Perl-Critic-Policy-Variables-ProhibitUselessVarClearing
+
+0.001 2026-09-25 TEODESIAN
+    - Initial Release.  Reports a statement that empties a my variable,
+      such as %h = () or undef $x, when nothing reads the variable again
+      before the end of the block that declares it.

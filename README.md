@@ -113,6 +113,15 @@ A plain statement, which is what an assignment or a call to `undef` is.
 Reports a statement that only empties a lexical, when nothing can read the
 lexical again before the end of the block that declares it.
 
+# BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+[https://github.com/teodesian/perl-critic-policy-prohibituselessvarclearing/issues](https://github.com/teodesian/perl-critic-policy-prohibituselessvarclearing/issues)
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 # AUTHORS
 
 Current Maintainers:

@@ -40,6 +40,8 @@ declares the variable never reads it again:
     %h = ();
     @a = ();
     $x = undef;
+    $hr = {};
+    $ar = [];
     undef %h;
     undef @a;
     undef $x;
@@ -57,6 +59,19 @@ declares the variable never reads it again:
 
 A mention of the variable inside a string, a regular expression or a heredoc
 counts as a read, whether or not it interpolates.
+
+=head2 WHAT IT CANNOT SEE
+
+Emptying what a reference points to is not reported:
+
+    %$hr = ();
+    @{$ar} = ();
+    undef %$hr;
+
+That empties a hash or an array that other code can also hold a reference to,
+and nothing in the source says whether it does.  So the statement can matter
+even when nothing here reads C<$hr> again.  Giving the scalar a new, empty
+reference, as C<$hr = {}> does, changes only the scalar, and is reported.
 
 =head2 WHEN THE CLEARING DOES SOMETHING
 
@@ -147,12 +162,14 @@ sub _cleared_symbol {
     my @parts = $statement->schildren;
     pop @parts if @parts && $parts[-1]->isa('PPI::Token::Structure') && $parts[-1]->content eq q{;};
 
-    # An assignment of an empty list, or of undef, to the whole variable.
+    # An assignment to the whole variable of an empty list, of undef, or, for a
+    # scalar, of a new empty hash or array.
     if ( @parts == 3 && $parts[0]->isa('PPI::Token::Symbol') && $parts[1]->isa('PPI::Token::Operator') && $parts[1]->content eq q{=} ) {
         my $value = $parts[2];
         my $empty = $value->isa('PPI::Structure::List') && !$value->schildren;
         my $undef = $value->isa('PPI::Token::Word')     && $value->content eq 'undef';
-        return $parts[0]->symbol if $empty || $undef;
+        my $fresh = $value->isa('PPI::Structure::Constructor') && !$value->schildren && $parts[0]->raw_type eq q{$};
+        return $parts[0]->symbol if $empty || $undef || $fresh;
         return;
     }
 

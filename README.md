@@ -34,6 +34,8 @@ declares the variable never reads it again:
 %h = ();
 @a = ();
 $x = undef;
+$hr = {};
+$ar = [];
 undef %h;
 undef @a;
 undef $x;
@@ -54,6 +56,21 @@ my %h;  sub f { %h = () }           # the next call reads it
 
 A mention of the variable inside a string, a regular expression or a heredoc
 counts as a read, whether or not it interpolates.
+
+## WHAT IT CANNOT SEE
+
+Emptying what a reference points to is not reported:
+
+```
+%$hr = ();
+@{$ar} = ();
+undef %$hr;
+```
+
+That empties a hash or an array that other code can also hold a reference to,
+and nothing in the source says whether it does.  So the statement can matter
+even when nothing here reads `$hr` again.  Giving the scalar a new, empty
+reference, as `$hr = {}` does, changes only the scalar, and is reported.
 
 ## WHEN THE CLEARING DOES SOMETHING
 

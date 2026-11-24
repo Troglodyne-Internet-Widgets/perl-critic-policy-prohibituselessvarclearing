@@ -207,7 +207,7 @@ sub _declaring_block {
 sub _declares {
     my ( $statement, $symbol ) = @_;
     return if !$statement->isa('PPI::Statement::Variable') || $statement->type ne 'my';
-    return grep { $_ eq $symbol } $statement->variables;
+    return any { $_ eq $symbol } $statement->variables;
 }
 
 # Whether a block between $elem and $scope can run more than once, or later
